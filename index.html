@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>White Page</title>
+  <style>html,body{height:100%;margin:0;background:#fff;}</style>
+  <script>
+    (function(){
+      const SECRET='open';
+      const maxLen=SECRET.length;
+      const buffer=[];
+      let lastWin=null;
+      function pushChar(ch){
+        buffer.push(ch.toLowerCase());
+        if(buffer.length>maxLen)buffer.shift();
+        if(buffer.join('')===SECRET){
+          buffer.length=0;
+          openSecretTab();
+        }
+      }
+      function openSecretTab(){
+        try{
+          if(lastWin && !lastWin.closed){try{lastWin.close();}catch(e){}}
+          const winName='\u200B';
+          const w=window.open('about:blank',winName);
+          if(!w) return;
+          const html='<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>&#8203;</title><style>html,body{height:100%;margin:0;background:#000}iframe{position:fixed;inset:0;border:0;width:100%;height:100%;}</style></head><body><iframe src="https://blankwhitepage.github.io/mainpage/" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; fullscreen"></iframe></body></html>';
+          w.document.open();
+          w.document.write(html);
+          w.document.close();
+          lastWin=w;
+        }catch(e){}
+      }
+      window.addEventListener('keydown',function(ev){
+        const key=ev.key;
+        if(!ev.ctrlKey && !ev.metaKey && !ev.altKey){
+          if(key && key.length===1) pushChar(key);
+        }
+      },true);
+      window.addEventListener('paste',function(ev){
+        try{
+          const text=(ev.clipboardData||window.clipboardData).getData('text')||'';
+          for(const ch of text) if(ch && ch.length===1) pushChar(ch);
+        }catch(e){}
+      });
+      window.addEventListener('blur',function(){buffer.length=0;});
+    })();
+  </script>
+</head>
+<body></body>
+</html>
